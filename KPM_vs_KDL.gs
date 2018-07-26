@@ -57,6 +57,7 @@ function CompareToKPM() {
     var importRangeFormula = '=arrayformula(regexreplace(sort({importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmNamesRange + '"), importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmAmountsRange + '")}), " \\(([0-9]+)\\)", ""))';
 
     importSheet.getRange(1, emptyCol).setValue('=' + curSheetName + '!' + sheetNameCell);
+    importSheet.getRange(1, emptyCol+1).setValue('=' + curSheetName + '!' + sheetNameCell);
     importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
     
     Browser.msgBox("Script completed. Status if patients updated but patients only in the KPM spreadsheet not yet added.");
