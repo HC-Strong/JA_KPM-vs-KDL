@@ -43,10 +43,10 @@ function CompareToKPM() {
   
   if(!kpmIsURL)
   {
-    Browser.msgBox("not URL, and you'll need to connect it");
+    Browser.msgBox("No URL added in cell B1 of the Settings tab. Please add the URL for the KPM sheet, connect the sheets (see the Settings tab for more info) then re-run this script.");
   } else if (!kpmIsLinked)
   {
-    Browser.msgBox("you'll need to connect it");
+    Browser.msgBox("The KPM sheet isn't connectd. Please connect the sheets (see the Settings tab for more info) then re-run this script.");
   } else {
     var curSheetName = sheet.getName();
     sheet.getRange(sheetNameCell).setValue(curSheetName);
@@ -55,16 +55,11 @@ function CompareToKPM() {
     
     var emptyCol = FindFirstEmpty(importHeaders[0]);
     var importRangeFormula = '=arrayformula(regexreplace(sort({importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmNamesRange + '"), importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmAmountsRange + '")}), " \\(([0-9]+)\\)", ""))';
-    //var importRangeFormula = '=sort({importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmNamesRange + '"), importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmAmountsRange + '")})';
-    //var importRangeFormula = '=sort(importRange("' + kpmID + '", ' + '"July19!L:L"))';
-    
-    //Browser.msgBox(importRangeFormula);
-    
+
     importSheet.getRange(1, emptyCol).setValue('=' + curSheetName + '!' + sheetNameCell);
     importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
     
-    Browser.msgBox("placeholder for adding a) finding where to put importRange formulas and b) adding them");
-    Browser.msgBox("done");
+    Browser.msgBox("Script completed. Status if patients updated but patients only in the KPM spreadsheet not yet added.");
   }
 }
 
