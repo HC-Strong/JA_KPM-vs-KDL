@@ -1,5 +1,5 @@
 // Script written by Hannah Strong <stronghannahc@gmail.com> for James Atkins, July 2018
-// Last edited: July 25, 2018
+// Last edited: July 26, 2018
 
 
 /** @OnlyCurrentDoc */
@@ -24,9 +24,10 @@ function CompareToKPM() {
   var kpmInfo = settingsSheet.getRange("B1:B5").getValues();
   var kpmIdCell = "B3";
   
-  var kpmNamesRange = "L:L";
+  var kpmPatientsRange = "L:L";
   var kpmAmountsRange = "X:X";
   
+  var sheetPatientsRange = "B:B";
   var sheetNameCell = "Q1";
   
   var importHeadersRange = "B1:BZ1";
@@ -54,15 +55,19 @@ function CompareToKPM() {
     var importHeaders = importSheet.getRange(importHeadersRange).getValues();
     
     var emptyCol = FindFirstEmpty(importHeaders[0]);
-    var importRangeFormula = '=arrayformula(regexreplace(sort({importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmNamesRange + '"), importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmAmountsRange + '")}), " \\(([0-9]+)\\)", ""))';
+    var importRangeFormula = '=arrayformula(regexreplace(sort({importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmPatientsRange + '"), importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmAmountsRange + '")}), " \\(([0-9]+)\\)", ""))';
 
     importSheet.getRange(1, emptyCol).setValue('=' + curSheetName + '!' + sheetNameCell);
     importSheet.getRange(1, emptyCol+1).setValue('=' + curSheetName + '!' + sheetNameCell);
     importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
     
+    FindKpmExclusives(importSheet, emptyCol, sheet, sheetPatientsRange);
+    
     Browser.msgBox("Script completed. Status if patients updated but patients only in the KPM spreadsheet not yet added.");
   }
 }
+
+
 
 
 function FindFirstEmpty(array) {
@@ -71,4 +76,27 @@ function FindFirstEmpty(array) {
       return i+2;
     }
   }
+}
+
+
+
+
+function FindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
+  
+  var notFound = [[]];
+  var kpmPatients = importSheet.getRange(1, importCol,500, 1).getValues();
+  var kdlPatients = kdlSheet.getRange(kdlRange).getValues();
+  
+  for (var i = 1; i < 200; i++) {
+   var curKpmPatient = kpmPatients[i][0];
+    //Logger.log(curKpmPatient);
+    
+    for (var j = 1; j < 200; j++) {
+      if(curKpmPatient == kdlPatients[j][0]) {
+        break;
+      }
+    }
+    notFound[0].push(curKpmPatient);
+  }
+  Logger.log(notFound);
 }
