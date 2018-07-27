@@ -61,14 +61,17 @@ function CompareToKPM() {
     importSheet.getRange(1, emptyCol+1).setValue('=' + curSheetName + '!' + sheetNameCell);
     importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
     
-    var notFoundInKDL = FindKpmExclusives(importSheet.getRange(1, emptyCol,500, 1).getValues(), sheet.getRange("M:M").getValues());
+    var kdlNameValues = sheet.getRange("M:M").getValues();
+    
+    var notFoundInKDL = FindKpmExclusives(importSheet.getRange(1, emptyCol,500, 1).getValues(), kdlNameValues);
     
     
-   // FindFirstEmpty(
+   var colEnd = FindFirstEmpty2(kdlNameValues);
+    Logger.log("Last row is " + colEnd);
     
-    importSheet.getRange(12, 1, notFoundInKDL.length, 1).setValues(notFoundInKDL);
+    sheet.getRange(colEnd, 2, notFoundInKDL.length, 1).setValues(notFoundInKDL);
     
-    Browser.msgBox("Script completed. Status if patients updated but patients only in the KPM spreadsheet not yet added.");
+    Browser.msgBox("Comparison complete. The names of any patients in KPM but not found in daily log have been added at the bottom of the Patient column. No other data of theirs has been added.");
   }
 }
 
@@ -79,6 +82,19 @@ function FindFirstEmpty(array) {
   for (var i = 0; i < array.length; i++) {
     if(array[i].length < 1) {
       return i+2;
+    }
+  }
+}
+
+function FindFirstEmpty2(array) {
+
+  for (var i = 0; i < array.length; i++) {
+      Logger.log("it is: " + array[i][0].length);
+    if(array[i][0].length < 1) {
+      
+      Logger.log(array[i]);
+      Logger.log(array[i][0]);
+      return i+1;
     }
   }
 }
