@@ -61,7 +61,12 @@ function CompareToKPM() {
     importSheet.getRange(1, emptyCol+1).setValue('=' + curSheetName + '!' + sheetNameCell);
     importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
     
-    FindKpmExclusives(importSheet, emptyCol, sheet, sheetPatientsRange);
+    var notFoundInKDL = FindKpmExclusives(importSheet, emptyCol, sheet, "M:M");
+    
+    
+   // FindFirstEmpty(
+    
+    importSheet.getRange(12, 1, notFoundInKDL.length, 1).setValues(notFoundInKDL);
     
     Browser.msgBox("Script completed. Status if patients updated but patients only in the KPM spreadsheet not yet added.");
   }
@@ -99,4 +104,34 @@ function FindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets 
     notFound[0].push(curKpmPatient);
   }
   Logger.log(notFound);
+}
+
+
+function FindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
+  
+  var notFound = [];
+  var kpmPatients = importSheet.getRange(1, importCol,500, 1).getValues();
+  var kdlPatients = kdlSheet.getRange(kdlRange).getValues();
+  
+  
+  for (var i = 1; i < 5; i++) {
+    var curKpmPatient = kpmPatients[i][0];
+    Logger.log(curKpmPatient);
+    
+    notFound.push([curKpmPatient]);  //add to array to delete later if found
+    Logger.log(notFound + " < after temp add");
+    
+    if(curKpmPatient.length > 1) {
+      for (var j = 1; j < 5; j++) {
+        if(curKpmPatient.toUpperCase() == kdlPatients[j][0].toUpperCase()) {
+          notFound.pop();
+          Logger.log("Found in KDL");
+          Logger.log(notFound);
+          break;
+        }
+      }
+    }
+  }
+      Logger.log("Final result of not found names: " + notFound);
+  return notFound;
 }
