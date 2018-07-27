@@ -42,8 +42,7 @@ function CompareToKPM() {
   Logger.log("URL is " + kpmURL  + " and ID is " + kpmID + ".   It is " + kpmIsURL + " that the URL is a URL and " + kpmIsLinked + " that the KPM spreadsheet is linked");
 
   
-  if(!kpmIsURL)
-  {
+  if(!kpmIsURL) {
     Browser.msgBox("No URL added in cell B1 of the Settings tab. Please add the URL for the KPM sheet, connect the sheets (see the Settings tab for more info) then re-run this script.");
   } else if (!kpmIsLinked)
   {
@@ -54,13 +53,32 @@ function CompareToKPM() {
     
     var importHeaders = importSheet.getRange(importHeadersRange).getValues();
     
-    var emptyCol = FindFirstEmpty(importHeaders[0]);
-    var importRangeFormula = '=arrayformula(regexreplace(sort({importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmPatientsRange + '"), importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmAmountsRange + '")}), " \\(([0-9]+)\\)", ""))';
-
-    importSheet.getRange(1, emptyCol).setValue('=' + curSheetName + '!' + sheetNameCell);
-    importSheet.getRange(1, emptyCol+1).setValue('=' + curSheetName + '!' + sheetNameCell);
-    importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
+    var headerExists = false;
     
+    for (var i = 0; i < importHeaders[0].length; i++) {
+      Logger.log(importHeaders[0][i]);
+      if(importHeaders[0][i] == curSheetName) {
+        headerExists = true;
+        var emptyCol = i+2;
+        Logger.log("emptyCol is " + emptyCol);
+        break;
+      }
+    }
+      
+    if (!headerExists) {
+    
+      emptyCol = FindFirstEmpty(importHeaders[0]);
+      var importRangeFormula = '=arrayformula(regexreplace(sort({importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmPatientsRange + '"), importRange(' + settingsSheetName + '!' +  kpmIdCell + ', ' + '"' + curSheetName + '!' + kpmAmountsRange + '")}), " \\(([0-9]+)\\)", ""))';
+
+      importSheet.getRange(1, emptyCol).setValue('=' + curSheetName + '!' + sheetNameCell);
+      importSheet.getRange(1, emptyCol+1).setValue('=' + curSheetName + '!' + sheetNameCell);
+      importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
+    } else {
+     Logger.log("Header already exists, skipping it and only checking for any items not found in KDL"); 
+    }
+    
+      
+      
     var kdlNameValues = sheet.getRange("M:M").getValues();
     
     var notFoundInKDL = FindKpmExclusives(importSheet.getRange(1, emptyCol,500, 1).getValues(), kdlNameValues);
@@ -71,7 +89,7 @@ function CompareToKPM() {
     
     sheet.getRange(colEnd, 2, notFoundInKDL.length, 1).setValues(notFoundInKDL);
     
-    Browser.msgBox("Comparison complete. The names of any patients in KPM but not found in daily log have been added at the bottom of the Patient column. No other data of theirs has been added.");
+    Browser.msgBox("Comparison complete. The names of any patients in KPM but not found in this daily log have been added at the bottom of the Patient column. No other data has been added for these patients.");
   }
 }
 
@@ -89,11 +107,8 @@ function FindFirstEmpty(array) {
 function FindFirstEmpty2(array) {
 
   for (var i = 0; i < array.length; i++) {
-      Logger.log("it is: " + array[i][0].length);
+      //Logger.log("it is: " + array[i][0].length);
     if(array[i][0].length < 1) {
-      
-      Logger.log(array[i]);
-      Logger.log(array[i][0]);
       return i+1;
     }
   }
@@ -132,17 +147,17 @@ function FindKpmExclusives(kpmPatients, kdlPatients){ // gets arrays of KPM (imp
   
   for (var i = 1; i < 5; i++) {
     var curKpmPatient = kpmPatients[i][0];
-    Logger.log(curKpmPatient);
+    //Logger.log(curKpmPatient);
     
     notFound.push([curKpmPatient]);  //add to array to delete later if found
-    Logger.log(notFound + " < after temp add");
+    //Logger.log(notFound + " < after temp add");
     
     if(curKpmPatient.length > 1) {
       for (var j = 1; j < 5; j++) {
         if(curKpmPatient.toUpperCase() == kdlPatients[j][0].toUpperCase()) {
           notFound.pop();
           Logger.log("Found in KDL");
-          Logger.log(notFound);
+          //Logger.log(notFound);
           break;
         }
       }
