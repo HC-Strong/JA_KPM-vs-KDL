@@ -61,7 +61,7 @@ function CompareToKPM() {
     importSheet.getRange(1, emptyCol+1).setValue('=' + curSheetName + '!' + sheetNameCell);
     importSheet.getRange(2, emptyCol).setValue(importRangeFormula);
     
-    var notFoundInKDL = FindKpmExclusives(importSheet, emptyCol, sheet, "M:M");
+    var notFoundInKDL = FindKpmExclusives(importSheet.getRange(1, emptyCol,500, 1).getValues(), sheet.getRange("M:M").getValues());
     
     
    // FindFirstEmpty(
@@ -86,7 +86,7 @@ function FindFirstEmpty(array) {
 
 
 
-function FindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
+function oldFindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
   
   var notFound = [[]];
   var kpmPatients = importSheet.getRange(1, importCol,500, 1).getValues();
@@ -107,11 +107,11 @@ function FindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets 
 }
 
 
-function FindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
+function FindKpmExclusives(kpmPatients, kdlPatients){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
   
   var notFound = [];
-  var kpmPatients = importSheet.getRange(1, importCol,500, 1).getValues();
-  var kdlPatients = kdlSheet.getRange(kdlRange).getValues();
+  //var kpmPatients = importSheet.getRange(1, importCol,500, 1).getValues();
+  //var kdlPatients = kdlSheet.getRange(kdlRange).getValues();
   
   
   for (var i = 1; i < 5; i++) {
