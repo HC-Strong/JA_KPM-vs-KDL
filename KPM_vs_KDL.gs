@@ -43,16 +43,17 @@ function CompareToKPM() {
   var kpmIsURL = kpmInfo[1][0];
   var kpmID = kpmInfo[2][0];
   var kpmIsLinked = kpmInfo[4][0];
-  Logger.log("URL is " + kpmURL  + " and ID is " + kpmID + ".   It is " + kpmIsURL + " that the URL is a URL and " + kpmIsLinked + " that the KPM spreadsheet is linked");
+  Logger.log('URL is ' + kpmURL  + ' and ID is ' + kpmID + '.   It is ' + kpmIsURL + ' that the URL is a URL and ' + kpmIsLinked + ' that the KPM spreadsheet is linked');
 
   
   if(!kpmIsURL) {
-    Browser.msgBox("No URL added in cell B1 of the Settings tab.   Please add the URL for the KPM sheet, connect the sheets (see the Settings tab for more info) then re-run this script.");
+    Browser.msgBox('No URL added in cell B1 of the Settings tab.   Please add the URL for the KPM sheet, connect the sheets (see the Settings tab for more info) then re-run this script.');
   } else if (!kpmIsLinked)
   {
     Browser.msgBox("The KPM sheet isn't connected.   Please connect the sheets (see the Settings tab for more info) then re-run this script.");
   } else {
     var curSheetName = sheet.getName();
+    Logger.log("curSheetName is " + curSheetName);
     sheet.getRange(sheetNameCell).setValue(curSheetName);
     
     var importHeaders = importSheet.getRange(importHeadersRange).getValues();
@@ -101,8 +102,11 @@ function CompareToKPM() {
     Logger.log("Last row is " + colEnd);
     
     sheet.getRange(colEnd, 2, notFoundInKDL.length, 1).setValues(notFoundInKDL);
-    
-    Browser.msgBox("Comparison complete.   The names of any patients in KPM but not found in this daily log have been added at the bottom of the Patient column. No other data has been added for these patients.");
+    if(sheet.getRange(colEnd, 2, 1, 1).getValue() == "#REF!") {
+       Browser.msgBox('Comparison Failed.   No tab named "' + curSheetName + '" found in KPM spreadsheet. Please ensure the tabs for each day have identical names in the KPM and KDL spreadsheets. Then re-run this script.'); 
+    } else {
+      Browser.msgBox('Comparison complete.   The names of any patients in KPM but not found in this daily log have been added at the bottom of the Patient column. No other data has been added for these patients.');
+    }
   }
 }
 
