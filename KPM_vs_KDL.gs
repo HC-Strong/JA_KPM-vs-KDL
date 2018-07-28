@@ -101,7 +101,9 @@ function CompareToKPM() {
    var colEnd = FindFirstEmpty2(kdlNameValues);
     Logger.log("Last row is " + colEnd);
     
+    Logger.log(notFoundInKDL.length);
     sheet.getRange(colEnd, 2, notFoundInKDL.length, 1).setValues(notFoundInKDL);
+    Logger.log("1");
     if(sheet.getRange(colEnd, 2, 1, 1).getValue() == "#REF!") {
        Browser.msgBox('Comparison Failed.   No tab named "' + curSheetName + '" found in KPM spreadsheet. Please ensure the tabs for each day have identical names in the KPM and KDL spreadsheets. Then re-run this script.'); 
     } else {
@@ -139,53 +141,53 @@ function FindFirstEmpty2(array) {
 
 
 
-function oldFindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
-  
-  var notFound = [[]];
-  var kpmPatients = importSheet.getRange(1, importCol,500, 1).getValues();
-  var kdlPatients = kdlSheet.getRange(kdlRange).getValues();
-  
-  for (var i = 1; i < 200; i++) {
-   var curKpmPatient = kpmPatients[i][0];
-    //Logger.log(curKpmPatient);
-    
-    for (var j = 1; j < 200; j++) {
-      if(curKpmPatient == kdlPatients[j][0]) {
-        break;
-      }
-    }
-    notFound[0].push(curKpmPatient);
-  }
-  Logger.log(notFound);
-}
-
-
-
-
-
 // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
 function FindKpmExclusives(kpmPatients, kdlPatients){ 
   
+  var notFoundRaw = [];
   var notFound = [];
   var checkMax = 200;   // set max number of rows for patients per day. James said 150 max so using 200 to be safe
   
   for (var i = 1; i < checkMax; i++) {
     var curKpmPatient = kpmPatients[i][0];
     
-    notFound.push([curKpmPatient]);  //add to array to delete later if found
+    notFoundRaw.push([curKpmPatient]);  //add to array to delete later if found
     
     if(curKpmPatient.length > 1) {
       for (var j = 1; j < checkMax; j++) {
         if(curKpmPatient.toUpperCase() == kdlPatients[j][0].toUpperCase()) {
-          notFound.pop();
+          notFoundRaw.pop();
           //Logger.log("Found in KDL");
           break;
         }
       }
     }
   }
-  Logger.log("Total # of patient names not found in KDL: " + notFound.length);
-  //Logger.log("Final result of not found names: " + notFound);
+  Logger.log("Total # of patient names not found in KDL: " + notFoundRaw.length);
+  Logger.log("The final result of not found names, before modifying to match KDL format, is: " + notFoundRaw);
+  
+    var blanksAllowed = 5;
+    var blanks = 0;
+  
+    for (var i = 0; i < notFoundRaw.length; i++) {
+      if(notFoundRaw[i][0].length > 0) {
+        Logger.log("yes, it is " + notFoundRaw[i][0] + " and the length is " + notFoundRaw[i][0].length);
+        var pieces = notFoundRaw[i][0].split(", ");
+        var formatted = pieces[1] + " " + pieces[0];
+        notFound.push([formatted]);
+      } else {
+        blanks++;
+        Logger.log("no, it's " + notFoundRaw[i][0] + " and the length is " + notFoundRaw[i][0].length + ", and blanks are " + blanks);
+        if (blanks >= blanksAllowed) {
+          Logger.log("exiting after checking " + blanks + " blank rows");
+          break;
+        }
+ 
+      }
+      //notFoundRaw[i] = notFoundRaw[i] + "test";
+    }
+  
+  Logger.log("And the final, final result of not found names is: " + notFound);
   
   return notFound;
 }
