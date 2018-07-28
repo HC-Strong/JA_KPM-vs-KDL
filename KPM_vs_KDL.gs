@@ -1,5 +1,5 @@
 // Script written by Hannah Strong <stronghannahc@gmail.com> for James Atkins, July 2018
-// Last edited: July 26, 2018
+// Last edited: July 27, 2018
 
 
 /** @OnlyCurrentDoc */
@@ -11,7 +11,11 @@ function onOpen() {
     SpreadsheetApp.getActiveSpreadsheet().addMenu('Comparison', compareMenu);
 }
 
-// Gets 
+
+
+
+
+
 function CompareToKPM() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getActiveSheet();
@@ -96,6 +100,8 @@ function CompareToKPM() {
 
 
 
+
+
 function FindFirstEmpty(array) {
   for (var i = 0; i < array.length; i++) {
     if(array[i].length < 1) {
@@ -103,6 +109,7 @@ function FindFirstEmpty(array) {
     }
   }
 }
+
 
 function FindFirstEmpty2(array) {
 
@@ -113,6 +120,8 @@ function FindFirstEmpty2(array) {
     }
   }
 }
+
+
 
 
 
@@ -138,31 +147,32 @@ function oldFindKpmExclusives(importSheet, importCol, kdlSheet, kdlRange){ // ge
 }
 
 
-function FindKpmExclusives(kpmPatients, kdlPatients){ // gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
+
+
+
+// gets arrays of KPM (imported) and KDL names and checks each KPM entry to see if it's in KDL. If it's not, it's added to the output array
+function FindKpmExclusives(kpmPatients, kdlPatients){ 
   
   var notFound = [];
-  //var kpmPatients = importSheet.getRange(1, importCol,500, 1).getValues();
-  //var kdlPatients = kdlSheet.getRange(kdlRange).getValues();
+  var checkMax = 200;   // set max number of rows for patients per day. James said 150 max so using 200 to be safe
   
-  
-  for (var i = 1; i < 5; i++) {
+  for (var i = 1; i < checkMax; i++) {
     var curKpmPatient = kpmPatients[i][0];
-    //Logger.log(curKpmPatient);
     
     notFound.push([curKpmPatient]);  //add to array to delete later if found
-    //Logger.log(notFound + " < after temp add");
     
     if(curKpmPatient.length > 1) {
-      for (var j = 1; j < 5; j++) {
+      for (var j = 1; j < checkMax; j++) {
         if(curKpmPatient.toUpperCase() == kdlPatients[j][0].toUpperCase()) {
           notFound.pop();
-          Logger.log("Found in KDL");
-          //Logger.log(notFound);
+          //Logger.log("Found in KDL");
           break;
         }
       }
     }
   }
-      Logger.log("Final result of not found names: " + notFound);
+  Logger.log("Total # of patient names not found in KDL: " + notFound.length);
+  //Logger.log("Final result of not found names: " + notFound);
+  
   return notFound;
 }
