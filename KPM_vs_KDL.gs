@@ -47,10 +47,10 @@ function CompareToKPM() {
 
   
   if(!kpmIsURL) {
-    Browser.msgBox("No URL added in cell B1 of the Settings tab. Please add the URL for the KPM sheet, connect the sheets (see the Settings tab for more info) then re-run this script.");
+    Browser.msgBox("No URL added in cell B1 of the Settings tab.   Please add the URL for the KPM sheet, connect the sheets (see the Settings tab for more info) then re-run this script.");
   } else if (!kpmIsLinked)
   {
-    Browser.msgBox("The KPM sheet isn't connectd. Please connect the sheets (see the Settings tab for more info) then re-run this script.");
+    Browser.msgBox("The KPM sheet isn't connected.   Please connect the sheets (see the Settings tab for more info) then re-run this script.");
   } else {
     var curSheetName = sheet.getName();
     sheet.getRange(sheetNameCell).setValue(curSheetName);
@@ -58,14 +58,23 @@ function CompareToKPM() {
     var importHeaders = importSheet.getRange(importHeadersRange).getValues();
     
     var headerExists = false;
+    var blanksAllowed = 5;
+    var blanks = 0;
     
     for (var i = 0; i < importHeaders[0].length; i++) {
-      Logger.log(importHeaders[0][i]);
+      Logger.log("Checking column header: " + importHeaders[0][i]);
       if(importHeaders[0][i] == curSheetName) {
         headerExists = true;
         var emptyCol = i+2;
         Logger.log("emptyCol is " + emptyCol);
         break;
+      } else if (!importHeaders[0][i]){
+        blanks++;
+        //Logger.log("This is #" + blanks + " of a max allowed " + blanksAllowed + " blank cells before the look exits");
+        if (blanks >= blanksAllowed) {
+          Logger.log("exiting after checking " + blanks + " blank column headers");
+          break;
+        }
       }
     }
       
@@ -93,7 +102,7 @@ function CompareToKPM() {
     
     sheet.getRange(colEnd, 2, notFoundInKDL.length, 1).setValues(notFoundInKDL);
     
-    Browser.msgBox("Comparison complete. The names of any patients in KPM but not found in this daily log have been added at the bottom of the Patient column. No other data has been added for these patients.");
+    Browser.msgBox("Comparison complete.   The names of any patients in KPM but not found in this daily log have been added at the bottom of the Patient column. No other data has been added for these patients.");
   }
 }
 
