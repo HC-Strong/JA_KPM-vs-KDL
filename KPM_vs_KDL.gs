@@ -159,6 +159,8 @@ function FindKpmExclusives(kpmPatients, kdlPatients){
           notFoundRaw.pop();
           //Logger.log("Found in KDL");
           break;
+        } else {
+          //Logger.log(curKpmPatient.toUpperCase() + " and " + kdlPatients[j][0].toUpperCase() + " somehow do not match");
         }
       }
     }
